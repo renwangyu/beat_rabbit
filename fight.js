@@ -69,16 +69,16 @@ function ship(ctx) {
 				r: (b.width + b.height) / 4
 			});
 			if (hit) {
-				if(callback && typeof callback === 'function'){
-					callback();
-				}
 				this.hp -= b.weili;
 				gameMonitor.bulletArr.splice(i, 1);
 				i--;
-			}
-			if (this.hp <= 0) {
-				this.destory();
-				break;
+				if(callback && typeof callback === 'function'){
+					callback();
+				}
+				if (this.hp <= 0) {
+					this.destory();
+					break;
+				}
 			}
 		}
 		return this;
