@@ -63,6 +63,9 @@ function ship(ctx) {
 		};
 		for (var i = 0; i < gameMonitor.bulletArr.length; i++) {
 			var b = gameMonitor.bulletArr[i];
+			if (b.role === CONFIG.ROLE.SHIP) {
+				continue;
+			}
 			var hit = util.isHit(c1, {
 				x: b.left + b.width / 2,
 				y: b.top + b.height / 2,
@@ -91,7 +94,7 @@ function ship(ctx) {
 		var me = this;
 		//按下鼠标定位ship，并使ship可移动
 		$body.on(CONFIG.EVENT_TYPE.MOUSE_DOWN, '#' + CONFIG.CANVAS_ID, function (e) {
-			if (gameMonitor.status !== CONFIG.GAME_STATUS.RUN) {
+			if (gameMonitor.status !== CONFIG.GAME_STATUS.RUN || me.hp <= 0) {
 				return;
 			}
 			me.setMove(true);
@@ -108,7 +111,7 @@ function ship(ctx) {
 		//移动鼠标让ship移动
 		$body.on(CONFIG.EVENT_TYPE.MOUSE_MOVE, '#' + CONFIG.CANVAS_ID, function (e) {
 			e.preventDefault();
-			if(!me.move){
+			if(!me.move || me.hp <= 0){
 				return;
 			}
 			//除以2是为了让鼠标在飞船中间
@@ -159,11 +162,13 @@ function enemy(ctx) {
 		return this;
 	};
 	this.move = function () {
-		this.left -= 1 * this.speed;
-		return this;
+		if (this.hp > 0) {
+			this.left -= 1 * this.speed;
+			return this;
+		}
 	};
 	this.autoAttack = function () {
-		var t = util.ranBetween(1000, 2000);
+		var t = util.ranBetween(1000, 3000);
 		this.attackTimer = setTimeout(function () {
 			var b = new bullet({
 				ctx: this._ctx,
@@ -179,12 +184,49 @@ function enemy(ctx) {
 		}.bind(this), t);
 		return this;
 	};
-	this.detectHit = function () {
-
+	this.detectHit = function (callback) {
+		var c1 = {
+			x: this.left + this.width / 2,
+			y: this.top + this.height / 2,
+			r: (this.width + this.height) / 4
+		};
+		for (var i = 0; i < gameMonitor.bulletArr.length; i++) {
+			var b = gameMonitor.bulletArr[i];
+			if (b.role === CONFIG.ROLE.ENEMY) {
+				continue;
+			}
+			var hit = util.isHit(c1, {
+				x: b.left + b.width / 2,
+				y: b.top + b.height / 2,
+				r: (b.width + b.height) / 4
+			});
+			if (hit) {
+				this.hp -= b.weili;
+				gameMonitor.bulletArr.splice(i, 1);
+				i--;
+				if (callback && typeof callback === 'function') {
+					callback();
+				}
+				if (this.hp <= 0) {
+					this.destory();
+					break;
+				}
+			}
+		}
 		return this;
 	};
 	this.destory = function () {
-		this.paint();
+		if (this.hp < 0) {
+			this.paint();
+			setTimeout(function () {
+				for (var i = 0, ii = gameMonitor.enemyArr.length; i < ii; i++) {
+					if (gameMonitor.enemyArr[i] === this) {
+						gameMonitor.enemyArr.splice(i, 1);
+						break;
+					}
+				}
+			}.bind(this), 250);
+		}
 		clearTimeout(this.attackTimer);
 	}
 }
@@ -379,17 +421,17 @@ var gameMonitor = {
 		var t = util.ranBetween(1000, 2000);
 		var e = new enemy(ctx);
 		e.autoAttack();
-		this.addEnemy(e);
 		setTimeout(function () {
+			this.addEnemy(e);
 			gameMonitor.createEnemy(ctx);
-		}, t);
+		}.bind(this), t);
 	},
 	run: function (ctx) {
 		ctx.clearRect(0, 0, this.width, this.height);
 		//重绘背景
 		this.bgRoll(ctx);
 		//重绘ship
-		this.ship.paint().detectHit();
+		this.ship.detectHit().paint();
 		//重绘所有bullet
 		for (var i = 0, ii = this.bulletArr.length; i < ii; i++) {
 			var bullet = this.bulletArr[i];
@@ -398,7 +440,7 @@ var gameMonitor = {
 		//重绘所有enemy
 		for (var m = 0, mm = this.enemyArr.length; m < mm; m++) {
 			var enemy = this.enemyArr[m];
-			enemy.paint().move();
+			enemy.detectHit().paint().move();
 		}
 		this.gameTimer = setTimeout(function () {
 			gameMonitor.run(ctx);
