@@ -492,7 +492,7 @@ var gameMonitor = {
 	}
 }
 /*********************** game start ********************************/
-CONFIG.CANVAS_ID = 'gameStage';
+CONFIG.CANVAS_ID = 'game_stage';
 var ctx = CONFIG.CANVAS_CTX();
 //初始化游戏
 gameMonitor.init(ctx);

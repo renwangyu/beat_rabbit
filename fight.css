@@ -1,9 +1,10 @@
-body{
+body {
 	margin: 0;
 	padding: 0;
 	background: rgba(64, 64, 64, 0.5);
 }
-#gameBox{
+
+#game_box {
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -15,22 +16,26 @@ body{
 	transform: translate(-50%, -50%);
 	-webkit-transform: translate(-50%, -50%);
 }
-#infoBox{
+
+#game_stage {
+	background: #000;
+}
+
+#info_box{
 	margin-top: -500px;
 	margin-left: -15px;
-	
 }
-#infoBox>ul{
+
+#info_box > ul {
 	list-style: none;
 }
-#infoBox>ul>li{
+
+#info_box > ul > li {
 	float: left;
 	margin-right: 10px;
 }
-#infoBox>ul>li:after{
-	clear: both;
-}
-.icon{
+
+.icon {
 	position: relative;
 	background: url(res/icon.png) no-repeat;
 	background-size: 100%;
@@ -39,14 +44,16 @@ body{
 	border: 2.5px solid #fff;
 	border-radius: 50%;
 }
-.bar{
+
+.bar {
 	position: relative;
 	background: url(res/bar.png) no-repeat;
 	background-size: 100%;
 	height: 50px;
 	width: 150px;
 }
-.heart{
+
+.heart {
 	position: relative;
 	left: 4px;
 	top: -47px;
@@ -55,7 +62,13 @@ body{
 	height: 35px;
 	width: 35px;
 }
-.health{
+
+.pulse {
+	animation: pulse 0.5s cubic-bezier(0.34, 1.61, 0.7, 1);
+	-webkit-animation: pulse 0.5s cubic-bezier(0.34, 1.61, 0.7, 1);
+}
+
+.health {
 	position: relative;
 	top: -72px;
 	left: 44px;
@@ -64,11 +77,135 @@ body{
 	background: #fff;
 	border: 1px solid #000;
 }
-.curr-health{
+
+.curr-health {
 	width: 100px;
 	height: 15px;
+}
+
+.well-status {
 	background: #07F113;
 }
-#gameStage{
-	background: #000;
+
+.normal-status {
+	background: #FF9933;
+}
+
+.danger-status {
+	background: #FF0033;
+	animation: shining 0.5s infinite alternate;
+	-webkit-animation: shining 0.5s infinite alternate;
+}
+
+.myBullet {
+	position: relative;
+	color: #000;
+}
+
+.myBullet > img {
+	width: 50px;
+	height: 50px;
+}
+
+.myBullet > span {
+	position: relative;
+	top: -15px;
+	font: italic small-caps 20px arial;
+}
+
+#bullet_num {
+	font: italic small-caps 30px arial;
+}
+
+#talk {
+	display: none;
+	padding: 5px;
+	position: relative;
+	top: -50px;
+	left: 140px;
+	width: 100px;
+	height: 60px;
+	border-radius: 0px 10px 10px 10px;
+	-webkit-border-radius: 0px 10px 10px 10px;
+	word-warp: break-word;
+	background: #FFF;
+}
+
+#talk > div {
+	position: absolute;
+	left: -20px;
+	border-top: 10px solid #FFF;
+	border-right: 10px solid transparent;
+	border-bottom: 10px solid transparent;
+	border-left: 10px solid transparent;
+	transform: rotate(90deg);
+	-webkit-transform: rotate(90deg);
+}
+
+#talk > span {
+	font: bold small-caps 5px arial;
+}
+/**
+ * 血条闪烁动画
+ */
+@keyframes shining {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+@-webkit-keyframes shining {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+/**
+ * 脉搏动画
+ */
+@keyframes pulse {
+	0% {
+		transform: scale(1);
+		-webkit-transorm: scale(1);
+	}
+	30% {
+		transform: scale(0.7);
+		-webkit-transorm: scale(0.7);
+	}
+	70% {
+		transform: scale(1.5);
+		-webkit-transorm: scale(1.5);
+	}
+	100% {
+		transform: scale(1);
+		-webkit-transorm: scale(1);
+	}
+}
+
+@-webkit-keyframes pulse {
+	0% {
+		transform: scale(1);
+		-webkit-transorm: scale(1);
+	}
+	30% {
+		transform: scale(0.7);
+		-webkit-transorm: scale(0.7);
+	}
+	80% {
+		transform: scale(1.5);
+		-webkit-transorm: scale(1.5);
+	}
+	100% {
+		transform: scale(1);
+		-webkit-transorm: scale(1);
+	}
+}
+
+.clear{
+	clear: both;
 }

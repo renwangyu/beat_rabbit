@@ -7,9 +7,9 @@
 		<script src="lib/jquery-2.1.3.min.js"></script>
 	</head>
 	<body>
-		<div id="gameBox">
-			<canvas id="gameStage" width="800" height="500"></canvas>
-			<div id="infoBox">
+		<div id="game_box">
+			<canvas id="game_stage" width="800" height="500"></canvas>
+			<div id="info_box">
 				<ul>
 					<li>
 						<div class="icon"></div>
@@ -18,15 +18,22 @@
 						<div class="bar"></div>
 						<div class="heart"></div>
 						<div class="health">
-							<div class="curr-health"></div>
+							<div class="curr-health well-status"></div>
 						</div>
 					</li>
 					<li>
 						<div class="myBullet">
 							<img src="res/mc_rainbow.png">
+							<span>X</span>
+							<span id="bullet_num">1<span>
 						</div>
 					</li>
 				</ul>
+				<div class="clear"></div>
+				<div id="talk">
+					<div></div>
+					<span>试，测试，测试，测试，</span>
+				</div>
 	        </div>
 		</div>
 
