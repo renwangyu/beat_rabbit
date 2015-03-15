@@ -28,7 +28,7 @@ function ship(ctx) {
 	this.left = gameMonitor.width / 5 - this.width;
 	this.top = gameMonitor.height / 2 - this.height / 2;
 	this.shipImg = gameMonitor.im.createImg(CONFIG.IMG_PATH.SHIP);
-	this.bulletCount = 9999;
+	this.bulletCount = 3;
 	this.hp = 100;
 	this.move = false;
 	this.paint = function () {
@@ -76,7 +76,7 @@ function ship(ctx) {
 				gameMonitor.bulletArr.splice(i, 1);
 				i--;
 				if(callback && typeof callback === 'function'){
-					callback();
+					callback(this.hp);
 				}
 				if (this.hp <= 0) {
 					this.destory();
@@ -123,6 +123,9 @@ function ship(ctx) {
 		//按space键攻击
 		$body.on(CONFIG.EVENT_TYPE.KEY_DOWN, function (e) {
 			if (gameMonitor.status !== CONFIG.GAME_STATUS.RUN || e.keyCode !== CONFIG.KEY_CODE.SPACE || me.bulletCount <= 0) {
+				if (me.bulletCount <= 0) {
+					uiController.showDialog('我勒个去，哥，别点了，没子弹啦！');
+				}
 				return;
 			}
 			//创建子弹
@@ -138,7 +141,11 @@ function ship(ctx) {
 				top: me.top
 			});
 			//ship子弹数减1
-			me.bulletCount--;
+			if(me.bulletCount > 0){
+				me.bulletCount--;
+			}
+			uiController.shipShot(me.bulletCount);
+
 		});
 		return this;
 	};
@@ -275,9 +282,6 @@ function bullet(info) {
 
 	};
 	function lineTrack() {
-		// var k = (this.top - this.targetPos.top) / (this.left - this.targetPos.left);
-		// this.left -= 1 * this.speed;
-		// this.top = k * this.left;
 		if (this.isAtShipLeft) {
 			this.left += util.ranBetween(1, 5) * this.speed;
 		} else {
@@ -354,6 +358,25 @@ var CONFIG = {
 		RIGHT: 39,
 		DOWN: 40
 	},
+	DIALOG: [
+		'宇宙霹雳无敌帅气聪明的<span style="color: red;">爆爆</span>，加油~',
+		'live free，die well！fighting！！',
+		'<span style="color: red;">442574518</span>求包养啊。。。(┬＿┬)55555',
+		'<span style="color: red;">爆爆</span>的飞船四不四很帅气~~',
+		'丢屎你，米兔！叫你让我抢不到小米。。。',
+		'来呀！(#‵ ′)凸',
+		'单身，求勾引~ -。-',
+		'跪求约会，躺求失身！',
+		'如果帅是一种罪，那我已经罪恶滔天',
+		'如果酷是一种错，那我已经一错再错',
+		'如果聪明要受到惩罚，那我不是要千刀万剐',
+		'骚连，好腻害！',
+		'小心驾驶，记得保养哦~',
+		'谁说<span style="color: red;">爆爆</span>不帅，我跟谁急！',
+		'watch out！！',
+		'作者<span style="color: red;">爆爆</span>有点自恋，联系请谨慎！',
+		'妹纸，约约约！！！'
+	],
 	START_TIME: null,
 	END_TIME: null
 };
@@ -377,7 +400,7 @@ var gameMonitor = {
 	score: {
 		beat: 0,
 		distance: 0,
-		elapse: 0,
+		timePass: 0,
 		bulletGet: 0
 	},
 	im: imgMonitor(),
@@ -412,6 +435,8 @@ var gameMonitor = {
 				me.run(ctx);
 				me.createEnemy(ctx);
 				me.check();
+				//ui初始化
+				uiController.init();
 				me.status = CONFIG.GAME_STATUS.RUN;
 			}
 		});
@@ -431,7 +456,7 @@ var gameMonitor = {
 		//重绘背景
 		this.bgRoll(ctx);
 		//重绘ship
-		this.ship.detectHit().paint();
+		this.ship.detectHit(uiController.shipHit).paint();
 		//重绘所有bullet
 		for (var i = 0, ii = this.bulletArr.length; i < ii; i++) {
 			var bullet = this.bulletArr[i];
@@ -490,9 +515,72 @@ var gameMonitor = {
 			gameMonitor.check();
 		}, 1000);
 	}
+};
+/**
+ * 游戏UI控制对象
+ * @type {Object}
+ */
+var uiController = {
+	dialogTimer: null,
+	dialogCloseTimer: null,
+	init: function () {
+		this.dialogLoop();
+		
+	},
+	shipHit: function (hp) {
+		$('.heart').addClass('pulse');
+		setTimeout(function () {
+			$('.heart').removeClass('pulse');
+		}, 300);
+		$('.curr-health').css('width', hp);
+		if (hp < 30) {
+			$('.curr-health').removeClass('well-status').removeClass('normal-status').addClass('danger-status');
+		} else if (hp < 60) {
+			$('.curr-health').removeClass('well-status').removeClass('danger-status').addClass('normal-status');
+		} else {
+			$('.curr-health').removeClass('danger-status').removeClass('normal-status').addClass('well-status');
+		}
+	},
+	shipShot: function (bulletCount) {
+		$('#bullet_num').text(bulletCount);
+		if (bulletCount === 0) {
+			$('#bullet_num').css('color', '#FF0033');
+		} else {
+			$('#bullet_num').css('color', '#000');
+		}
+	},
+	enemyHit: function () {
+
+	},
+	getBullet: function () {
+
+	},
+	dialogLoop: function () {
+		this.showDialog();
+		this.dialogTimer = setTimeout(function () {
+			this.dialogLoop();
+		}.bind(this), 5000);
+	},
+	showDialog: function (str) {
+		clearTimeout(this.dialogTimer);
+		if (str) {
+			$('#talk>span').text(str);
+			this.dialogTimer = setTimeout(function () {
+				this.dialogLoop();
+			}.bind(this), 5000);
+		} else {
+			var index = util.ranBetween(0, CONFIG.DIALOG.length - 1);
+			$('#talk>span').html(CONFIG.DIALOG[index]);
+		}
+		$('#talk').show();
+		this.dialogCloseTimer = setTimeout(function () {
+			$('#talk').hide();
+		}, 2000);
+	}
 }
 /*********************** game start ********************************/
 CONFIG.CANVAS_ID = 'game_stage';
 var ctx = CONFIG.CANVAS_CTX();
 //初始化游戏
 gameMonitor.init(ctx);
+// uiController.init();

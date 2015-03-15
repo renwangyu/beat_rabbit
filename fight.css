@@ -64,8 +64,8 @@ body {
 }
 
 .pulse {
-	animation: pulse 0.5s cubic-bezier(0.34, 1.61, 0.7, 1);
-	-webkit-animation: pulse 0.5s cubic-bezier(0.34, 1.61, 0.7, 1);
+	animation: pulse 0.3s cubic-bezier(0.34, 1.61, 0.7, 1);
+	-webkit-animation: pulse 0.3s cubic-bezier(0.34, 1.61, 0.7, 1);
 }
 
 .health {
@@ -93,8 +93,8 @@ body {
 
 .danger-status {
 	background: #FF0033;
-	animation: shining 0.5s infinite alternate;
-	-webkit-animation: shining 0.5s infinite alternate;
+	animation: shining 0.3s infinite alternate;
+	-webkit-animation: shining 0.3s infinite alternate;
 }
 
 .myBullet {
@@ -143,7 +143,7 @@ body {
 }
 
 #talk > span {
-	font: bold small-caps 5px arial;
+	font: bold small-caps 10px arial;
 }
 /**
  * 血条闪烁动画
