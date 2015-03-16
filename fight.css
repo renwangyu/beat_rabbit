@@ -81,6 +81,8 @@ body {
 .curr-health {
 	width: 100px;
 	height: 15px;
+	transition: all ease 0.8s;
+	-webkit-transition: all ease 0.8s;
 }
 
 .well-status {

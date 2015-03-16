@@ -28,7 +28,7 @@ function ship(ctx) {
 	this.left = gameMonitor.width / 5 - this.width;
 	this.top = gameMonitor.height / 2 - this.height / 2;
 	this.shipImg = gameMonitor.im.createImg(CONFIG.IMG_PATH.SHIP);
-	this.bulletCount = 3;
+	this.bulletCount = 2;
 	this.hp = 100;
 	this.move = false;
 	this.paint = function () {
@@ -86,6 +86,55 @@ function ship(ctx) {
 		}
 		return this;
 	};
+	this.detectRestore = function (callback) {
+		var c1 = {
+			x: this.left + this.width / 2,
+			y: this.top + this.height / 2,
+			r: (this.width + this.height) / 4
+		};
+		for (var i = 0; i < gameMonitor.feedArr.length; i++) {
+			var f = gameMonitor.feedArr[i];
+			var hit = util.isHit(c1, {
+				x: f.left + f.width / 2,
+				y: f.top + f.height / 2,
+				r: (f.width + f.height) / 4
+			});
+			if (hit) {
+				this.hp += f.restore;
+				this.hp = this.hp > 100 ? 100 : this.hp;
+				gameMonitor.feedArr.splice(i, 1);
+				i--;
+				if(callback && typeof callback === 'function'){
+					callback(this.hp);
+				}
+			}
+		}
+		return this;
+	};
+	this.detectAmmo = function (callback) {
+		var c1 = {
+			x: this.left + this.width / 2,
+			y: this.top + this.height / 2,
+			r: (this.width + this.height) / 4
+		};
+		for (var i = 0; i < gameMonitor.ammoArr.length; i++) {
+			var a = gameMonitor.ammoArr[i];
+			var hit = util.isHit(c1, {
+				x: a.left + a.width / 2,
+				y: a.top + a.height / 2,
+				r: (a.width + a.height) / 4
+			});
+			if (hit) {
+				this.bulletCount += a.restore;
+				gameMonitor.ammoArr.splice(i, 1);
+				i--;
+				if(callback && typeof callback === 'function'){
+					callback(this.bulletCount);
+				}
+			}
+		}
+		return this;
+	}
 	this.destory = function () {
 		console.error('ship has ben destory!!!!');
 	};
@@ -124,7 +173,7 @@ function ship(ctx) {
 		$body.on(CONFIG.EVENT_TYPE.KEY_DOWN, function (e) {
 			if (gameMonitor.status !== CONFIG.GAME_STATUS.RUN || e.keyCode !== CONFIG.KEY_CODE.SPACE || me.bulletCount <= 0) {
 				if (me.bulletCount <= 0) {
-					uiController.showDialog('我勒个去，哥，别点了，没子弹啦！');
+					uiController.showDialog('哥，别点了，没子弹啦！省点用啊！');
 				}
 				return;
 			}
@@ -295,6 +344,55 @@ function bullet(info) {
 	};
 }
 /**
+ * 加血的补给
+ */
+function feed (ctx) {
+	this._ctx = ctx;
+	this.isMore = Math.random() < 0.2;
+	this.width = this.isMore ? 60 : 50;
+	this.height = this.isMore ? 60 : 50;
+	this.left = gameMonitor.width;
+	this.top = util.ranBetween(gameMonitor.height / 5, gameMonitor.height / 1.5);
+	this.speed = this.isMore ? 3 : 2;
+	this.restore = this.isMore ? 100 : 20;
+	this.feedImg = gameMonitor.im.createImg(this.isMore ? CONFIG.IMG_PATH.MORE_CARROT : CONFIG.IMG_PATH.SINGLE_CARROT);
+	this.paint = function () {
+		this._ctx.drawImage(this.feedImg, this.left, this.top, this.width, this.height);
+		return this;
+	};
+	this.move = function () {
+		this.left -= 1 * this.speed;
+		return this;
+	};
+	this.destory = function () {
+
+	};
+}
+/**
+ * 弹药的补给
+ */
+function ammo(ctx) {
+	this._ctx = ctx;
+	this.width = 80;
+	this.height = 80;
+	this.left = gameMonitor.width;
+	this.top = util.ranBetween(gameMonitor.height / 5, gameMonitor.height / 1.5);
+	this.speed = 3;
+	this.restore = 5;
+	this.ammoImg = gameMonitor.im.createImg(CONFIG.IMG_PATH.SHIP_BULLET);
+	this.paint = function () {
+		this._ctx.drawImage(this.ammoImg, this.left, this.top, this.width, this.height);
+		return this;
+	};
+	this.move = function () {
+		this.left -= 1 * this.speed;
+		return this;
+	};
+	this.destory = function () {
+
+	};
+}
+/**
  * 工具对象
  */
 var util = {
@@ -325,7 +423,9 @@ var CONFIG = {
 		SHIP_BULLET: 'res/mc_rainbow.png',
 		ENEMY_BULLET: 'res/mc_wr.png',
 		GEILI: 'res/geili.png',
-		YINHEN: 'res/yinhen.png'
+		YINHEN: 'res/yinhen.png',
+		SINGLE_CARROT: 'res/single_carrot.png',
+		MORE_CARROT: 'res/more_carrot.png'
 	},
 	ROLE: {
 		SHIP: 1,
@@ -360,20 +460,18 @@ var CONFIG = {
 	},
 	DIALOG: [
 		'宇宙霹雳无敌帅气聪明的<span style="color: red;">爆爆</span>，加油~',
-		'live free，die well！fighting！！',
 		'<span style="color: red;">442574518</span>求包养啊。。。(┬＿┬)55555',
 		'<span style="color: red;">爆爆</span>的飞船四不四很帅气~~',
+		'绝对正品！戳！<br><a style="color:red;" target="blank" href="http://shop108155733.taobao.com/?spm=a230r.7195193.1997079397.2.HXy4wR">萌宝妈妈海淘小铺</a>',
 		'丢屎你，米兔！叫你让我抢不到小米。。。',
 		'来呀！(#‵ ′)凸',
 		'单身，求勾引~ -。-',
 		'跪求约会，躺求失身！',
-		'如果帅是一种罪，那我已经罪恶滔天',
-		'如果酷是一种错，那我已经一错再错',
-		'如果聪明要受到惩罚，那我不是要千刀万剐',
+		'绝对正品！戳！<br><a style="color:red;" target="blank" href="http://shop108155733.taobao.com/?spm=a230r.7195193.1997079397.2.HXy4wR">萌宝妈妈海淘小铺</a>',
 		'骚连，好腻害！',
 		'小心驾驶，记得保养哦~',
 		'谁说<span style="color: red;">爆爆</span>不帅，我跟谁急！',
-		'watch out！！',
+		'绝对正品！戳！<br><a style="color:red;" target="blank" href="http://shop108155733.taobao.com/?spm=a230r.7195193.1997079397.2.HXy4wR">萌宝妈妈海淘小铺</a>',
 		'作者<span style="color: red;">爆爆</span>有点自恋，联系请谨慎！',
 		'妹纸，约约约！！！'
 	],
@@ -392,6 +490,8 @@ var gameMonitor = {
 	ship: null,	//飞船
 	bulletArr: [],	//子弹s
 	enemyArr: [],	//敌人s
+	feedArr: [],	//加血补给s
+	ammoArr: [],	//子弹补给s
 	bgWidth: 800,
 	bgHeight: 500,
 	bgDistance: 0,	//背景位置
@@ -401,7 +501,8 @@ var gameMonitor = {
 		beat: 0,
 		distance: 0,
 		timePass: 0,
-		bulletGet: 0
+		bulletGet: 0,
+		carrotGet: 0
 	},
 	im: imgMonitor(),
 	status: CONFIG.GAME_STATUS.WAIT,
@@ -434,13 +535,14 @@ var gameMonitor = {
 			if (e.keyCode === CONFIG.KEY_CODE.ENTER) {
 				me.run(ctx);
 				me.createEnemy(ctx);
+				me.createCarrot(ctx);
+				me.createAmmo(ctx);
 				me.check();
 				//ui初始化
 				uiController.init();
 				me.status = CONFIG.GAME_STATUS.RUN;
 			}
 		});
-
 	},
 	createEnemy: function (ctx) {
 		var t = util.ranBetween(1000, 2000);
@@ -451,12 +553,31 @@ var gameMonitor = {
 			gameMonitor.createEnemy(ctx);
 		}.bind(this), t);
 	},
+	createCarrot: function (ctx) {
+		var t = util.ranBetween(4000, 6000);
+		var f = new feed(ctx);
+		setTimeout(function () {
+			this.addFeed(f);
+			this.createCarrot(ctx)
+		}.bind(this), t);
+	},
+	createAmmo: function (ctx) {
+		var t = util.ranBetween(8000,15000);
+		var a = new ammo(ctx);
+		setTimeout(function () {
+			this.addAmmo(a);
+			this.createAmmo(ctx)
+		}.bind(this), t);
+	},
 	run: function (ctx) {
 		ctx.clearRect(0, 0, this.width, this.height);
 		//重绘背景
 		this.bgRoll(ctx);
 		//重绘ship
-		this.ship.detectHit(uiController.shipHit).paint();
+		this.ship.detectHit(uiController.shipHit)
+				 .detectRestore(uiController.shipRestore)
+				 .detectAmmo(uiController.shipAmmo)
+				 .paint();
 		//重绘所有bullet
 		for (var i = 0, ii = this.bulletArr.length; i < ii; i++) {
 			var bullet = this.bulletArr[i];
@@ -466,6 +587,16 @@ var gameMonitor = {
 		for (var m = 0, mm = this.enemyArr.length; m < mm; m++) {
 			var enemy = this.enemyArr[m];
 			enemy.detectHit().paint().move();
+		}
+		//重绘所有feed
+		for (var n = 0, nn = this.feedArr.length; n < nn; n++) {
+			var feed = this.feedArr[n];
+			feed.paint().move();
+		}
+		//重绘所有ammo
+		for (var x = 0, xx = this.ammoArr.length; x < xx; x++) {
+			var ammo = this.ammoArr[x];
+			ammo.paint().move();
 		}
 		this.gameTimer = setTimeout(function () {
 			gameMonitor.run(ctx);
@@ -489,7 +620,13 @@ var gameMonitor = {
 	addEnemy: function (enemy) {
 		this.enemyArr.push(enemy);
 	},
-	//检查bullet数组和enemy数组，超过canvas边框的就踢出数组
+	addFeed: function (feed) {
+		this.feedArr.push(feed);
+	},
+	addAmmo: function (ammo) {
+		this.ammoArr.push(ammo);
+	},
+	//检查bullet数组，enemy数组和carrot数组，超过canvas边框的就踢出数组
 	check: function () {
 		//检查bullet数组
 		for (var i = 0; i < this.bulletArr.length; i++) {
@@ -511,6 +648,26 @@ var gameMonitor = {
 				m--;
 			}
 		}
+		//检查carrot数组
+		for (var n = 0; n < this.feedArr.length; n++) {
+			var f = this.feedArr[n];
+			if (f.left < 0 || f.left > this.width) {
+				f.destory();
+				f = null;
+				this.feedArr.splice(n, 1);
+				n--;
+			}
+		}
+		//检查ammo数组
+		for (var x = 0; x < this.ammoArr.length; x++) {
+			var a = this.ammoArr[x];
+			if (x.left < 0 || x.left > this.width) {
+				x.destory();
+				x = null;
+				this.ammoArr.splice(x, 1);
+				x--;
+			}
+		}
 		this.checkTimer = setTimeout(function () {
 			gameMonitor.check();
 		}, 1000);
@@ -518,14 +675,13 @@ var gameMonitor = {
 };
 /**
  * 游戏UI控制对象
- * @type {Object}
  */
 var uiController = {
 	dialogTimer: null,
 	dialogCloseTimer: null,
 	init: function () {
 		this.dialogLoop();
-		
+		$('#bullet_num').text(gameMonitor.ship.bulletCount);
 	},
 	shipHit: function (hp) {
 		$('.heart').addClass('pulse');
@@ -540,6 +696,23 @@ var uiController = {
 		} else {
 			$('.curr-health').removeClass('danger-status').removeClass('normal-status').addClass('well-status');
 		}
+	},
+	shipRestore: function (hp) {
+		$('.curr-health').css('width', hp);
+		if (hp < 30) {
+			$('.curr-health').removeClass('well-status').removeClass('normal-status').addClass('danger-status');
+		} else if (hp < 60) {
+			$('.curr-health').removeClass('well-status').removeClass('danger-status').addClass('normal-status');
+		} else {
+			$('.curr-health').removeClass('danger-status').removeClass('normal-status').addClass('well-status');
+		}
+	},
+	shipAmmo: function (num) {
+		$('.myBullet').addClass('pulse');
+		setTimeout(function () {
+			$('.myBullet').removeClass('pulse');
+		}, 300);
+		$('#bullet_num').text(num);
 	},
 	shipShot: function (bulletCount) {
 		$('#bullet_num').text(bulletCount);
