@@ -137,6 +137,7 @@ function ship(ctx) {
 	}
 	this.destory = function () {
 		console.error('ship has ben destory!!!!');
+		gameMonitor.stop();
 	};
 	this.controll = function () {
 		var $body = $(document.body);
@@ -460,7 +461,7 @@ var CONFIG = {
 	},
 	DIALOG: [
 		'宇宙霹雳无敌帅气聪明的<span style="color: red;">爆爆</span>，加油~',
-		'<span style="color: red;">442574518</span>求包养啊。。。(┬＿┬)55555',
+		'<span style="color: red;">442574518</span>求包养凸^-^凸。。。',
 		'<span style="color: red;">爆爆</span>的飞船四不四很帅气~~',
 		'绝对正品！戳！<br><a style="color:red;" target="blank" href="http://shop108155733.taobao.com/?spm=a230r.7195193.1997079397.2.HXy4wR">萌宝妈妈海淘小铺</a>',
 		'丢屎你，米兔！叫你让我抢不到小米。。。',
@@ -484,8 +485,11 @@ var CONFIG = {
 var gameMonitor = {
 	width: 800,
 	height: 500,
-	gameTimer: null,
-	checkTimer: null,
+	gameTimer: null,	// 游戏timer
+	checkTimer: null,	// 检查timer
+	ceTimer: null,	// 创建敌人的timer
+	ccTimer: null,	// 创建萝卜的timer
+	caTimer: null,	// 创建补给的timer
 	bg: null,	//背景
 	ship: null,	//飞船
 	bulletArr: [],	//子弹s
@@ -506,23 +510,11 @@ var gameMonitor = {
 	},
 	im: imgMonitor(),
 	status: CONFIG.GAME_STATUS.WAIT,
-	gameTimer: null,
 	init: function (ctx) {
 		var me = this;
-		//绘制游戏背景
-		var bg = new Image();
-		bg.onload = function () {
-			ctx.drawImage(bg, 0, 0, me.bgWidth, me.bgHeight);
-		}
-		bg.src = CONFIG.IMG_PATH.BG;
-		me.bg = bg;
-		//创建游戏飞船
-		var myShip = new ship(ctx);
-		myShip.controll();
-		me.ship = myShip;
+		me.status = CONFIG.GAME_STATUS.READY;
 		//绑定游戏事件
 		me.bindEvents(ctx);
-		me.status = CONFIG.GAME_STATUS.READY;
 	},
 	bindEvents: function (ctx) {
 		var me = this;
@@ -533,14 +525,26 @@ var gameMonitor = {
 				return;
 			}
 			if (e.keyCode === CONFIG.KEY_CODE.ENTER) {
+				me.status = CONFIG.GAME_STATUS.RUN;
+				//绘制游戏背景
+				var bg = new Image();
+				bg.onload = function () {
+					ctx.drawImage(bg, 0, 0, me.bgWidth, me.bgHeight);
+				}
+				bg.src = CONFIG.IMG_PATH.BG;
+				me.bg = bg;
+				//创建游戏飞船
+				var myShip = new ship(ctx);
+				myShip.controll();
+				me.ship = myShip;
+
 				me.run(ctx);
 				me.createEnemy(ctx);
 				me.createCarrot(ctx);
 				me.createAmmo(ctx);
 				me.check();
 				//ui初始化
-				uiController.init();
-				me.status = CONFIG.GAME_STATUS.RUN;
+				uiController.start();
 			}
 		});
 	},
@@ -548,7 +552,7 @@ var gameMonitor = {
 		var t = util.ranBetween(1000, 2000);
 		var e = new enemy(ctx);
 		e.autoAttack();
-		setTimeout(function () {
+		this.ceTimer = setTimeout(function () {
 			this.addEnemy(e);
 			gameMonitor.createEnemy(ctx);
 		}.bind(this), t);
@@ -556,7 +560,7 @@ var gameMonitor = {
 	createCarrot: function (ctx) {
 		var t = util.ranBetween(4000, 6000);
 		var f = new feed(ctx);
-		setTimeout(function () {
+		this.ccTimer = setTimeout(function () {
 			this.addFeed(f);
 			this.createCarrot(ctx)
 		}.bind(this), t);
@@ -564,13 +568,16 @@ var gameMonitor = {
 	createAmmo: function (ctx) {
 		var t = util.ranBetween(8000,15000);
 		var a = new ammo(ctx);
-		setTimeout(function () {
+		this.caTimer = setTimeout(function () {
 			this.addAmmo(a);
 			this.createAmmo(ctx)
 		}.bind(this), t);
 	},
 	run: function (ctx) {
 		ctx.clearRect(0, 0, this.width, this.height);
+		if (this.status === CONFIG.GAME_STATUS.OVER) {
+			return;
+		}
 		//重绘背景
 		this.bgRoll(ctx);
 		//重绘ship
@@ -603,8 +610,29 @@ var gameMonitor = {
 		}, 1000 / 60);
 	},
 	stop: function (ctx) {
-		clearTimeout(this.gameTimer);
 		this.status = CONFIG.GAME_STATUS.OVER;
+		this.resetGameElement();
+		uiController.stop();
+	},
+	resetGameElement: function () {
+		clearTimeout(this.gameTimer);
+		clearTimeout(this.checkTimer);
+		clearTimeout(this.ceTimer);
+		clearTimeout(this.ccTimer);
+		clearTimeout(this.caTimer);
+		this.gameTimer = null;
+		this.checkTimer = null;
+		this.ceTimer = null;
+		this.ccTimer = null;
+		this.caTimer = null;
+		this.bg = null;	//背景
+		this.ship = null;	//飞船
+		this.bulletArr.length = 0;	//子弹s
+		this.enemyArr.length = 0;	//敌人s
+		this.feedArr.length = 0;	//加血补给s
+		this.ammoArr.length = 0;	//子弹补给s
+		this.bgDistance = 0;	//背景位置
+		this.bgLoop = 0;
 	},
 	bgRoll: function (ctx) {
 		if (this.bgDistance >= this.bgWidth) {
@@ -679,9 +707,21 @@ var gameMonitor = {
 var uiController = {
 	dialogTimer: null,
 	dialogCloseTimer: null,
-	init: function () {
+	ready: function () {
+		$('#info_box').hide();
+		$('#over_page').hide();
+	},
+	start: function () {
+		$('.curr-health').removeClass('danger-status').removeClass('normal-status').addClass('well-status').css({'width': 100});
+		$('#info_box').show();
+		$('#start_page').hide();
+		$('#over_page').hide();
 		this.dialogLoop();
 		$('#bullet_num').text(gameMonitor.ship.bulletCount);
+	},
+	stop: function () {
+		$('#info_box').hide();
+		$('#over_page').show();
 	},
 	shipHit: function (hp) {
 		$('.heart').addClass('pulse');
@@ -756,4 +796,4 @@ CONFIG.CANVAS_ID = 'game_stage';
 var ctx = CONFIG.CANVAS_CTX();
 //初始化游戏
 gameMonitor.init(ctx);
-// uiController.init();
+uiController.ready();
