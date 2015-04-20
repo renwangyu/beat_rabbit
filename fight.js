@@ -304,7 +304,7 @@ function bullet(info) {
 	this.left = info.left;
 	this.top = info.top;
 	this.role = info.role;
-	this.speed = !!info.role ? 10 : 1; //ship子弹速度为10，enemy子弹速度为1
+	this.speed = !!info.role ? 10 : 1.5; //ship子弹速度为10，enemy子弹速度为1
 	this.weili = this.bigone ? 50 : 30;
 	this.bulletImg = gameMonitor.im.createImg(!!info.role ? CONFIG.IMG_PATH.SHIP_BULLET : CONFIG.IMG_PATH.ENEMY_BULLET);
 	this.targetPos = null;
@@ -360,7 +360,7 @@ function feed (ctx) {
 	this.height = this.isMore ? 60 : 50;
 	this.left = gameMonitor.width;
 	this.top = util.ranBetween(gameMonitor.height / 5, gameMonitor.height / 1.5);
-	this.speed = this.isMore ? 4 : 3;
+	this.speed = this.isMore ? 5 : 3;
 	this.restore = this.isMore ? 100 : 20;
 	this.feedImg = gameMonitor.im.createImg(this.isMore ? CONFIG.IMG_PATH.MORE_CARROT : CONFIG.IMG_PATH.SINGLE_CARROT);
 	this.paint = function () {
@@ -385,7 +385,7 @@ function ammo(ctx) {
 	this.left = gameMonitor.width;
 	this.top = util.ranBetween(gameMonitor.height / 5, gameMonitor.height / 1.5);
 	this.speed = 4;
-	this.restore = 3;
+	this.restore = 2;
 	this.ammoImg = gameMonitor.im.createImg(CONFIG.IMG_PATH.SHIP_BULLET);
 	this.paint = function () {
 		this._ctx.drawImage(this.ammoImg, this.left, this.top, this.width, this.height);
