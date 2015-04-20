@@ -4,6 +4,9 @@ body {
 	background: rgba(64, 64, 64, 0.5);
 }
 em {
+	font-weight: bold;
+	font-size: 1.2em;
+	font-style: normal;
 	color: #F00;
 }
 
@@ -26,7 +29,7 @@ em {
 
 #info_box{
 	margin-top: -500px;
-	margin-left: -15px;
+	margin-left: 15px;
 }
 
 #info_box > ul {
@@ -126,20 +129,20 @@ em {
 	display: none;
 	padding: 5px;
 	position: relative;
-	top: -50px;
-	left: 140px;
+	top: -75px;
+	left: 85px;
 	width: 100px;
 	height: 60px;
 	border-radius: 0px 10px 10px 10px;
 	-webkit-border-radius: 0px 10px 10px 10px;
 	word-warp: break-word;
-	background: #FFF;
+	background: #FFE;
 }
 
 #talk > div {
 	position: absolute;
 	left: -20px;
-	border-top: 10px solid #FFF;
+	border-top: 10px solid #FFE;
 	border-right: 10px solid transparent;
 	border-bottom: 10px solid transparent;
 	border-left: 10px solid transparent;
@@ -151,8 +154,108 @@ em {
 	font: bold small-caps 10px arial;
 }
 
+.forkme {
+    position: absolute;
+    right: 0;
+    cursor: pointer;
+}
+
 .desc {
 	color: #FFF;
+}
+
+.flex-box {
+	display:-webkit-box;
+	display: flex;
+	-webkit-box-orient: vertical;
+	box-orient: vertical;
+}
+
+.flex-1 {
+	flex: 1;
+}
+
+.margin-50 {
+	margin: 50px;
+}
+
+.margin-10 {
+	margin: 10px;
+}
+
+.my-talk {
+	margin: 0 40px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	background: #FFE;
+}
+.my-talk:before {
+	content: '';
+	position: absolute;
+	top: 40px;
+	left: 110px;
+	width: 0px;
+	height: 0px;
+	border-top: 20px solid #FFE;
+	border-right: 20px solid transparent;
+	border-bottom: 20px solid transparent;
+	border-left: 20px solid transparent;
+	-webkit-transform: rotate(90deg);
+	transform: rotate(90deg);
+}
+
+a[name='mbmm'] {
+	text-decoration:none;
+}
+a[name='mbmm']:hover {
+	animation: pulse 0.5s cubic-bezier(0.34, 1.61, 0.7, 1);
+	-webkit-animation: pulse 0.5s cubic-bezier(0.34, 1.61, 0.7, 1);
+}
+
+ul {
+	list-style-type: none;
+	padding: 0px;
+}
+ul > li {
+	margin-bottom: 20px;
+}
+
+.text-shining {
+	animation: shining 0.8s cubic-bezier(0.42, 0, 0.58, 1.0) infinite alternate;
+	-webkit-animation: shining 0.8s cubic-bezier(0.42, 0, 0.58, 1.0) infinite alternate;
+}
+
+.shake {
+	animation: shake 0.8s cubic-bezier(0.42, 0, 0.58, 1.0) infinite alternate;
+	-webkit-animation: shake 0.8s cubic-bezier(0.42, 0, 0.58, 1.0) infinite alternate;
+}
+
+.rotate {
+	animation: rotate 1s linear infinite;
+	-webkit-animation: rotate 1s linear infinite;
+}
+
+.key-style {
+	display: inline-block;
+	padding: 3px 9px 5px;
+	font-size: 12px;
+	font-weight: normal;
+	line-height: 16px;
+	color: #6E6E6E;
+	white-space: nowrap;
+	vertical-align: middle;
+	background-color: #fcfcfc;
+	border-radius: 3px;
+	border: 1px solid #cccccc;
+	text-transform: capitalize;
+	box-shadow: inset 0 -2px #ebebeb, inset 0 -3px #ffffff, 0 1px 2px rgba(255, 255, 255, 0.3);
+	cursor: pointer;
+}
+
+.no-select-drag {
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-user-drag: none;
 }
 
 /**
@@ -196,7 +299,6 @@ em {
 		-webkit-transorm: scale(1);
 	}
 }
-
 @-webkit-keyframes pulse {
 	0% {
 		transform: scale(1);
@@ -215,7 +317,76 @@ em {
 		-webkit-transorm: scale(1);
 	}
 }
-
+/**
+ * 摇动动画
+ */
+@keyframes shake {
+	from {
+		transform: rotate(-30deg);
+		-webkit-transorm: rotate(-30deg);
+	}
+	to {
+		transform: rotate(30deg);
+		-webkit-transorm: rotate(30deg);
+	}
+}
+@-webkit-keyframes shake {
+	from {
+		transform: rotate(-30deg);
+		-webkit-transorm: rotate(-30deg);
+	}
+	to {
+		transform: rotate(30deg);
+		-webkit-transorm: rotate(30deg);
+	}
+}
+/**
+ * 脉搏动画
+ */
+@keyframes rotate {
+	0% {
+		transform: rotate(0deg);
+		-webkit-transorm: rotate(0deg);
+	}
+	25% {
+		transform: rotate(90deg);
+		-webkit-transorm: rotate(90deg);
+	}
+	50% {
+		transform: rotate(180deg);
+		-webkit-transorm: rotate(180deg);
+	}
+	75% {
+		transform: rotate(270deg);
+		-webkit-transorm: rotate(270deg);
+	}
+	100% {
+		transform: rotate(360deg);
+		-webkit-transorm: rotate(360deg);
+	}
+}
+@-webkit-keyframes rotate {
+	0% {
+		transform: rotate(0deg);
+		-webkit-transorm: rotate(0deg);
+	}
+	25% {
+		transform: rotate(90deg);
+		-webkit-transorm: rotate(90deg);
+	}
+	50% {
+		transform: rotate(180deg);
+		-webkit-transorm: rotate(180deg);
+	}
+	75% {
+		transform: rotate(270deg);
+		-webkit-transorm: rotate(270deg);
+	}
+	100% {
+		transform: rotate(360deg);
+		-webkit-transorm: rotate(360deg);
+	}
+}
 .clear{
 	clear: both;
 }

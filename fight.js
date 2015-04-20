@@ -107,6 +107,8 @@ function ship(ctx) {
 				if(callback && typeof callback === 'function'){
 					callback(this.hp);
 				}
+				// score的carrotGet增加
+				gameMonitor.scoreUp('carrot');
 			}
 		}
 		return this;
@@ -131,6 +133,8 @@ function ship(ctx) {
 				if(callback && typeof callback === 'function'){
 					callback(this.bulletCount);
 				}
+				// score的bulletGet增加
+				gameMonitor.scoreUp('bullet');
 			}
 		}
 		return this;
@@ -285,6 +289,8 @@ function enemy(ctx) {
 			}.bind(this), 250);
 		}
 		clearTimeout(this.attackTimer);
+		// score的beat增加
+		gameMonitor.scoreUp('beat');
 	}
 }
 /**
@@ -354,7 +360,7 @@ function feed (ctx) {
 	this.height = this.isMore ? 60 : 50;
 	this.left = gameMonitor.width;
 	this.top = util.ranBetween(gameMonitor.height / 5, gameMonitor.height / 1.5);
-	this.speed = this.isMore ? 3 : 2;
+	this.speed = this.isMore ? 4 : 3;
 	this.restore = this.isMore ? 100 : 20;
 	this.feedImg = gameMonitor.im.createImg(this.isMore ? CONFIG.IMG_PATH.MORE_CARROT : CONFIG.IMG_PATH.SINGLE_CARROT);
 	this.paint = function () {
@@ -378,8 +384,8 @@ function ammo(ctx) {
 	this.height = 80;
 	this.left = gameMonitor.width;
 	this.top = util.ranBetween(gameMonitor.height / 5, gameMonitor.height / 1.5);
-	this.speed = 3;
-	this.restore = 5;
+	this.speed = 4;
+	this.restore = 3;
 	this.ammoImg = gameMonitor.im.createImg(CONFIG.IMG_PATH.SHIP_BULLET);
 	this.paint = function () {
 		this._ctx.drawImage(this.ammoImg, this.left, this.top, this.width, this.height);
@@ -460,21 +466,21 @@ var CONFIG = {
 		DOWN: 40
 	},
 	DIALOG: [
-		'宇宙霹雳无敌帅气聪明的<span style="color: red;">爆爆</span>，加油~',
-		'<span style="color: red;">442574518</span>求包养凸^-^凸。。。',
-		'<span style="color: red;">爆爆</span>的飞船四不四很帅气~~',
-		'绝对正品！戳！<br><a style="color:red;" target="blank" href="http://shop108155733.taobao.com/?spm=a230r.7195193.1997079397.2.HXy4wR">萌宝妈妈海淘小铺</a>',
+		'宇宙霹雳无敌帅气聪明的<span style="color: #F00;">爆爆</span>，加油~',
+		'<span style="color: #F00;">442574518</span>求包养 凸^-^凸 。。。',
+		'<span style="color: #F00;">爆爆</span>的飞船四不四很帅气~~',
+		'绝对正品！戳！<br><a style="color:#F00;" target="blank" href="http://shop108155733.taobao.com/?spm=a230r.7195193.1997079397.2.HXy4wR">萌宝妈妈海淘小铺</a>',
 		'丢屎你，米兔！叫你让我抢不到小米。。。',
-		'来呀！(#‵ ′)凸',
+		'来呀！  (#‵ ′)凸',
 		'单身，求勾引~ -。-',
 		'跪求约会，躺求失身！',
-		'绝对正品！戳！<br><a style="color:red;" target="blank" href="http://shop108155733.taobao.com/?spm=a230r.7195193.1997079397.2.HXy4wR">萌宝妈妈海淘小铺</a>',
+		'绝对正品！戳！<br><a style="color:#F00;" target="blank" href="http://shop108155733.taobao.com/?spm=a230r.7195193.1997079397.2.HXy4wR">萌宝妈妈海淘小铺</a>',
 		'骚连，好腻害！',
 		'小心驾驶，记得保养哦~',
-		'谁说<span style="color: red;">爆爆</span>不帅，我跟谁急！',
-		'绝对正品！戳！<br><a style="color:red;" target="blank" href="http://shop108155733.taobao.com/?spm=a230r.7195193.1997079397.2.HXy4wR">萌宝妈妈海淘小铺</a>',
-		'作者<span style="color: red;">爆爆</span>有点自恋，联系请谨慎！',
-		'妹纸，约约约！！！'
+		'谁说<span style="color: #F00;">爆爆</span>不帅，我跟谁急！',
+		'绝对正品！戳！<br><a style="color:#F00;" target="blank" href="http://shop108155733.taobao.com/?spm=a230r.7195193.1997079397.2.HXy4wR">萌宝妈妈海淘小铺</a>',
+		'作者<span style="color: #F00;">爆爆</span>有点自恋，联系请谨慎！',
+		'求妹纸，约约约！！！'
 	],
 	START_TIME: null,
 	END_TIME: null
@@ -525,6 +531,7 @@ var gameMonitor = {
 				return;
 			}
 			if (e.keyCode === CONFIG.KEY_CODE.ENTER) {
+				me.scoreClear();
 				me.status = CONFIG.GAME_STATUS.RUN;
 				//绘制游戏背景
 				var bg = new Image();
@@ -611,8 +618,9 @@ var gameMonitor = {
 	},
 	stop: function (ctx) {
 		this.status = CONFIG.GAME_STATUS.OVER;
-		this.resetGameElement();
 		uiController.stop();
+		this.scoreClear();
+		this.resetGameElement();
 	},
 	resetGameElement: function () {
 		clearTimeout(this.gameTimer);
@@ -641,6 +649,8 @@ var gameMonitor = {
 		this.bgDistance = ++this.bgLoop * this.bgSpeed;
 		ctx.drawImage(this.bg, this.bgWidth - this.bgDistance, 0, this.bgWidth, this.bgHeight);
 		ctx.drawImage(this.bg, -this.bgDistance, 0, this.bgWidth, this.bgHeight);
+		// score的距离+
+		this.scoreUp('distance');
 	},
 	addBullet: function (bullet) {
 		this.bulletArr.push(bullet);
@@ -653,6 +663,83 @@ var gameMonitor = {
 	},
 	addAmmo: function (ammo) {
 		this.ammoArr.push(ammo);
+	},
+	scoreUp: function (attr) {
+		switch (attr) {
+			case 'beat':
+				this.score.beat++;
+				break;
+			case 'distance':
+				this.score.distance = this.score.distance + 0.01;
+				break;
+			case 'bullet':
+				this.score.bulletGet++;
+				break;
+			case 'carrot':
+				this.score.carrotGet++;
+				break;
+			default:
+				break;
+		}
+	},
+	scoreGet: function (attr) {
+		switch (attr) {
+			case 'beat':
+				return this.score.beat;
+			case 'distance':
+				return +this.score.distance.toFixed(2);
+			case 'bullet':
+				return this.score.bulletGet;
+			case 'carrot':
+				return this.score.carrotGet;
+			default:
+				return;
+		}
+	},
+	scoreClear: function () {
+		this.score.beat = 0;
+		this.score.distance = 0;
+		this.score.bulletGet = 0;
+		this.score.carrotGet = 0;
+	},
+	evaluate: function () {
+		var beat = this.scoreGet('beat');
+		var distance = this.scoreGet('distance');
+		var bullet = this.scoreGet('bullet');
+		var carrot = this.scoreGet('carrot');
+		var result = 0;
+		if (beat >= 2 && beat < 5) {
+			result += 10;
+		} else if (beat >= 5 && beat < 15) {
+			result += 20;
+		} else if (beat >= 15 && beat <= 35) {
+			result += 30;
+		} else if (beat > 35) {
+			result += 40;
+		}
+
+		if (distance >= 50 && distance < 100) {
+			result += 10;
+		} else if (distance >= 100 && distance < 150) {
+			result += 20;
+		} else if (distance >= 150) {
+			result += 30;
+		}
+
+		if (bullet >= 2 && bullet < 4) {
+			result += 10;
+		} else if (bullet >= 4 && bullet < 8) {
+			result += 15
+		} else if (bullet >= 8) {
+			result += 20;
+		}
+
+		if (carrot >= 3 && carrot < 6) {
+			result += 5;
+		} else if (carrot >= 6) {
+			result += 10;
+		}
+		return result;
 	},
 	//检查bullet数组，enemy数组和carrot数组，超过canvas边框的就踢出数组
 	check: function () {
@@ -720,6 +807,22 @@ var uiController = {
 		$('#bullet_num').text(gameMonitor.ship.bulletCount);
 	},
 	stop: function () {
+		// 成绩填入
+		$('#dist').text(gameMonitor.scoreGet('distance'));
+		$('#beat').text(gameMonitor.scoreGet('beat'));
+		$('#bullet').text(gameMonitor.scoreGet('bullet'));
+		$('#carrot').text(gameMonitor.scoreGet('carrot'));
+		var evalResult = gameMonitor.evaluate();
+		$('#evalResult').text(evalResult);
+		if(evalResult>80){
+			$('img[name="geili"]').show();
+			$('img[name="yinhen"]').hide();
+			$('#evalResult~span').text('相当厉害！')
+		}else{
+			$('img[name="geili"]').hide();
+			$('img[name="yinhen"]').show();
+			$('#evalResult~span').text('再接再厉！')
+		}
 		$('#info_box').hide();
 		$('#over_page').show();
 	},

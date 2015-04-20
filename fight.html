@@ -7,7 +7,8 @@
 		<script src="lib/jquery-2.1.3.min.js"></script>
 	</head>
 	<body>
-		<div id="game_box">
+		<!--游戏舞台-->
+		<div id="game_box"  class="no-select-drag">
 			<canvas id="game_stage" width="800" height="500"></canvas>
 			<div id="info_box">
 				<ul>
@@ -36,11 +37,145 @@
 				</div>
 	        </div>
 		</div>
-		<div id="start_page">
-			<div class="desc">打<em>米兔</em></div>
+		<!--首屏说明-->
+		<div id="start_page" class="no-select-drag">
+			<div class="forkme">
+				<a target="_blank" href="https://github.com/renwangyu/beat_rabbit"><img src="res/forkme.png"></a>
+			</div>
+			<div class="margin-50 flex-box" style="position:relative;">
+				<div style="width:100px;">
+					<img src="res/rwy.png">
+					<div>
+						<span style="font-size:0.9em;color:#FFF;"><em>爆爆</em>442574518<span>
+					</div>
+				</div>
+				<div class="flex-1 my-talk">
+					<div class="margin-10" style="line-height:1.6em;">
+						怎么说呢，就是尽量<em>躲得更远打得更多</em>吧！人生如戏戏如人生。
+						<br>
+						感谢网络搜到的ufo兔子和米兔等所有图片资源，网络真是强大凸^-^凸
+						<br>
+						有任何问题或建议请联系我<a href="#">renwangyu@126.com</a>，妹纸附照必回哦~
+						<br>
+						唔，最后请经常<em>猛戳</em>→→<a name="mbmm" target="blank" href="http://shop108155733.taobao.com/?spm=a230r.7195193.1997079397.2.HXy4wR"><em>萌宝妈妈海淘小铺</em></a>←←哦亲~
+					</div>
+				</div>
+			</div>
+			<div class="margin-50 flex-box desc">
+				<!--操作说明-->
+				<div class="flex-1">
+					<span>操作说明：</span>
+					<ul>
+						<li>
+							<div>
+								<img src="res/mouse.png" style="width:50px; vertical-align: middle;">
+								<span>左键<em>按住</em>移动</span>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="key-style no-select-drag">space</span>
+								<span>单击<em>发射</em>子弹</span>
+							</div>
+						</li>
+						<li>
+							<div>
+								<span class="key-style no-select-drag">enter</span>
+								<span>单击<em>开始</em>游戏</span>
+							</div>
+						</li>
+					</ul>
+				</div>
+				<!--角色介绍-->
+				<div class="flex-1">
+					<span>角色介绍：</span>
+					<ul>
+						<li>
+							<div>
+								<img class="shake" src="res/ship.png" style="width:60px; vertical-align: middle;">
+								<span>不知道这家伙叫什么</span>
+							</div>
+						</li>
+						<li>
+							<div>
+								<img src="res/miturun.gif" style="width:60px; vertical-align: middle;">
+								<span>被打对象，不解释</span>
+							</div>
+						</li>
+					</ul>
+				</div>
+				<!--道具介绍-->
+				<div class="flex-1">
+					<span>道具介绍：</span>
+					<ul>
+						<li>
+							<div>
+								<img class="rotate" src="res/mc_rainbow.png" style="width:40px; vertical-align: middle;">
+								<span>打米兔专用，可获取</span>
+							</div>
+						</li>
+						<li>
+							<div>
+								<img class="rotate" src="res/mc_wr.png" style="width:40px; vertical-align: middle;">
+								<span>碰到么你懂得</span>
+							</div>
+						</li>
+						<li>
+							<div>
+								<img src="res/single_carrot.png" style="width:40px; vertical-align: middle;">
+								<span>小量HP回复</span>
+							</div>
+						</li>
+						<li>
+							<div>
+								<img src="res/more_carrot.png" style="width:40px; vertical-align: middle;">
+								<span>满状态HP回复</span>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="desc text-shining" style="margin-left:100px; margin-top:-100px; font-size: 20px;">press <em>Enter</em> to start game</div>
 		</div>
-		<div id="over_page">
-			<div class="desc">游戏<em>结束</em></div>
+		<!--结束统计-->
+		<div id="over_page"  class="no-select-drag">
+			<div class="forkme">
+				<a target="_blank" href="https://github.com/renwangyu/beat_rabbit"><img src="res/forkme.png"></a>
+			</div>
+			<div class="margin-50 flex-box" style="position:relative;">
+				<div style="width:100px;">
+					<img src="res/rwy.png">
+					<div>
+						<span style="font-size:0.9em;color:#FFF;"><em>爆爆</em>442574518<span>
+					</div>
+				</div>
+				<div class="flex-1 my-talk">
+					<div class="margin-10" style="line-height:1.6em;">
+						呵呵呵，亲，来看看战绩吧~
+						<br>
+						行进距离：<em id="dist"></em> m
+						<br>
+						打哭米兔：<em id="beat"></em>只
+						<br>
+						获取补给月饼：<em id="bullet"></em>只
+						<br>
+						获取萝卜总数：<em id="carrot"></em>个
+						<br>
+						唔，最后还是请经常<em>猛戳</em>→→<a name="mbmm" target="blank" href="http://shop108155733.taobao.com/?spm=a230r.7195193.1997079397.2.HXy4wR"><em>萌宝妈妈海淘小铺</em></a>←←哦亲~
+					</div>
+				</div>
+			</div>
+			<div class="margin-50 flex-box desc">
+				<div style="width:250px;">
+					总评价：<em id="evalResult"></em>分！<span></span>
+				</div>
+				<div class="flex-1">
+					<img name="geili" style="width:250px;" src="res/geili.png">
+					<img name="yinhen" style="width:250px;" src="res/yinhen.png">
+				</div>
+			</div>
+			<div>
+			<div class="desc text-shining" style="text-align:center; font-size: 20px;">press <em>Enter</em> to play again</div>
 		</div>
 
 		<script src="fight.js"></script>
