@@ -258,6 +258,13 @@ ul > li {
 	-webkit-user-drag: none;
 }
 
+.enter-tip {
+  position: absolute;
+  font-size: 20px;
+  left: 50px;
+  bottom: 25px;
+}
+
 /**
  * 血条闪烁动画
  */
